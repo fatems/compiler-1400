@@ -1,14 +1,29 @@
 
 	public enum TokenType {
-		Identifier,
+		
 	
 		Int,
-
+		
+		
+		
+		
+		
+		//change the position later
+		Identifier,
+		
+		
+		
+		
+		
+		
+		
+		
 		Double,
 		
 		String,
 		
 		Float,
+		IntValue,
 		
 		While,
 		
@@ -18,13 +33,23 @@
 		
 		Then,
 		
+		ElseIF,
+		
 		Else,
+		
+		EqualEqual,
+		
+		NotEqual,
 		
 		Assignment,
 		
 		Null,
 		Semicolon,
 		Comma,
+		
+		PlusPlus,
+		
+		MinusMinus,
 		
 		Plus,
 
@@ -40,25 +65,23 @@
 		
 		Or,
 		
-		EqualEqual,
 		
-		NotEqual,
 		
-		Greater,
-
-		Less,
+		
 
 		GreaterOrEqual,
 		
 		LessOrEqual,
 		
-		PlusPlus,
+		Greater,
+
+		Less,
 		
-		MinusMinus,
+		
 		
 		Break,
 		
-		ElseIF,
+		
 		
 		Static,
 		
@@ -105,6 +128,7 @@
 		True,
 		
 		False;
+		
 
 		
 
