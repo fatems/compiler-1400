@@ -19,11 +19,12 @@ import java.util.regex.Pattern;
 public class Lexer {
 
 	/** Mapping from type of token to its regular expression */
-	private Map<TokenType, String> regEx;
+	 Map<TokenType, String> regEx;
 
 	/** List of tokens as they appear in the input source */
-	private List<Token> result;
+	 List<Token> result;
 
+	 String src;
 	/**
 	 * Initializes a newly created {@code Lexer} object
 	 */
@@ -99,11 +100,14 @@ public class Lexer {
 			throw new IllegalArgumentException("Illegal index in the input stream!");
 		}
 		for (TokenType tokenType : TokenType.values()) {
-			Pattern p = Pattern.compile(".{" + fromIndex + "}" + regEx.get(tokenType),
+			//System.out.println(tokenType);
+			Pattern p = Pattern.compile(".{" + fromIndex + "}"  + regEx.get(tokenType),
 					Pattern.DOTALL);
-			Matcher m = p.matcher(source);
+			Matcher m = p.matcher(source );
 			if (m.matches()) {
 				String lexema = m.group(1);
+				System.out.println(tokenType);
+				
 				return new Token(fromIndex, fromIndex + lexema.length(), lexema, tokenType);
 			}
 		}
@@ -116,37 +120,56 @@ public class Lexer {
 	 * 
 	 */
 	private void launchRegEx() {
-		regEx.put(TokenType.Identifier, "\\b([a-zA-Z]{1}[0-9a-zA-Z_]{0,31})\\b.*");
+		
+		
+		//change the place of identifier later and add .* to the first of all these
 		regEx.put(TokenType.Int, "\\b(int)\\b.*");
-		regEx.put(TokenType.Double, "\\b(int|double)\\b.*");
-		regEx.put(TokenType.String, "\\(string)\\b.*");
-		regEx.put(TokenType.Float, "\\(float)\\b.*");
+		
+		
+		
+		
+		regEx.put(TokenType.Identifier, ".*\\b([a-zA-Z]{1}[0-9a-zA-Z_]{0,31})\\b.*");
+
+		regEx.put(TokenType.Double, "\\b(double)\\b.*");
+		regEx.put(TokenType.String, "\\b(String)\\b.*");
+		regEx.put(TokenType.Float, "\\b(float)\\b.*");
+		regEx.put(TokenType.WhiteSpace, "( ).*");
+		regEx.put(TokenType.IntValue, "\\[0-9]{1}[0-9]*\\.*");
+		
 		regEx.put(TokenType.While, "\\b(while)\\b.*");
 		
 		regEx.put(TokenType.For, "\\b(for)\\b.*");
 		regEx.put(TokenType.If, "\\b(if)\\b.*");
 		regEx.put(TokenType.Then, "\\b(then)\\b.*");
+		regEx.put(TokenType.ElseIF, "\\b(elsif)\\b.*");
 		regEx.put(TokenType.Else, "\\b(else)\\b.*");
+		regEx.put(TokenType.EqualEqual, "(==).*");
+		regEx.put(TokenType.NotEqual, "(\\!=).*");
 		regEx.put(TokenType.Assignment, "(=).*");
 		regEx.put(TokenType.Null, "\\b(null)\\b.*");
 		regEx.put(TokenType.Semicolon, "(;).*");
 		regEx.put(TokenType.Comma, "(,).*");
+		regEx.put(TokenType.PlusPlus, "(\\++).*");
+		regEx.put(TokenType.MinusMinus, "(\\--).*");
 		regEx.put(TokenType.Plus, "(\\+{1}).*");
 		regEx.put(TokenType.Minus, "(\\-{1}).*");
 		regEx.put(TokenType.Multiply, "(\\*).*");
 		regEx.put(TokenType.Divide, "(/).*");
 		regEx.put(TokenType.Mod, "(%).*");
-		regEx.put(TokenType.And, "(&&).*");
-		regEx.put(TokenType.Or, "(||).*");
-		regEx.put(TokenType.EqualEqual, "(==).*");
-		regEx.put(TokenType.NotEqual, "(\\!=).*");
-		regEx.put(TokenType.Greater, "(>)");
-		regEx.put(TokenType.Less, "(<)");
+		regEx.put(TokenType.And, "(\\&&).*");
+		
+		
+		
+		regEx.put(TokenType.Or, "(\\||).*");
+		
+		
 		regEx.put(TokenType.GreaterOrEqual, "(>=).*");
 		regEx.put(TokenType.LessOrEqual, "(<=).*");
-		regEx.put(TokenType.PlusPlus, "(++).*");
-		regEx.put(TokenType.MinusMinus, "(--).*");
-		regEx.put(TokenType.ElseIF, "(elsif).*");
+		regEx.put(TokenType.Greater, "(>).*");
+		regEx.put(TokenType.Less, "(<).*");
+		regEx.put(TokenType.Break, "\\b(break)\\b.*");
+		
+		
 		regEx.put(TokenType.Static, "\\b(static)\\b.*");
 		regEx.put(TokenType.Void, "\\b(void)\\b.*");
 		regEx.put(TokenType.Public, "\\b(public)\\b.*");
@@ -161,7 +184,7 @@ public class Lexer {
 		regEx.put(TokenType.Case, "\\b(case)\\b.*");
 		regEx.put(TokenType.BlockComment, "(/\\*.*?\\*/).*");
 		regEx.put(TokenType.LineComment, "(//(.*?)[\r$]?\n).*");
-		regEx.put(TokenType.WhiteSpace, "( ).*");
+		
 		regEx.put(TokenType.Tab, "(\\t).*");
 		regEx.put(TokenType.NewLine, "(\\n).*");
 		regEx.put(TokenType.CloseBrace, "(\\)).*");
@@ -170,6 +193,7 @@ public class Lexer {
 		regEx.put(TokenType.ClosingCurlyBrace, "(\\}).*");
 		regEx.put(TokenType.True, "\\b(true)\\b.*");
 		regEx.put(TokenType.False, "\\b(false)\\b.*");
+//		regEx.put(TokenType.Identifier, "\\b([a-zA-Z]{1}[0-9a-zA-Z_]{0,31})\\b.*");
 
 
 
