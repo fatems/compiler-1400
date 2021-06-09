@@ -26,6 +26,7 @@ public class Controller {
 			L.tokenize(myString);
 			
 			System.out.println(L.getTokens());
+			System.out.println(L.SymbolResult);
 			
 			
 		} catch (FileNotFoundException e) {
