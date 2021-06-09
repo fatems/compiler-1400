@@ -1,16 +1,9 @@
 
 	public enum TokenType {
 		
-	
-		Int,
+		//,
 		
-		
-		
-		
-		
-		//change the position later
-		Identifier,
-		
+		Int,		
 		
 		
 		
@@ -21,9 +14,11 @@
 		Double,
 		
 		String,
-		
-		Float,
+		StringValue,
 		IntValue,
+		Float,
+		FloatDouble,
+		
 		
 		While,
 		
@@ -127,7 +122,9 @@
 //		IntConstant,
 		True,
 		
-		False;
+		False,
+		Identifier;
+
 		
 
 		
