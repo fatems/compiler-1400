@@ -1,147 +1,65 @@
 
-	public enum TokenType {
-		
-		//,
-		
-		Int,		
-		
-		
-		
-		
-		
-		
-		
-		Double,
-		
-		String,
-		StringValue,
-		IntValue,
-		Float,
-		FloatDouble,
-		
-		
-		While,
-		
-		For,
-		
-		If,
-		
-		Then,
-		
-		ElseIF,
-		
-		Else,
-		
-		EqualEqual,
-		
-		NotEqual,
-		
-		Assignment,
-		
-		Null,
-		Semicolon,
-		Comma,
-		
-		PlusPlus,
-		
-		MinusMinus,
-		
-		Plus,
-
-		Minus,
-		
-		Multiply,
-
-		Divide,
-		
-		Mod,
-		
-		And,
-		
-		Or,
-		
-		
-		
-		
-
-		GreaterOrEqual,
-		
-		LessOrEqual,
-		
-		Greater,
-
-		Less,
-		
-		
-		
-		Break,
-		
-		
-		
-		Static,
-		
-		Void,
-		
-		Public,
-		
-		Default,
-		Continue,
-		Return,
-		Long,
-		
-		Char,
-		Boolean,
-		Class,
-		
-		Switch,
-		
-		Case,
-		
-		
-		
-		BlockComment,
-
-		LineComment,
-
-		WhiteSpace,
-
-		Tab,
-
-		NewLine,
-
-		CloseBrace,
-
-		OpenBrace,
-
-		OpeningCurlyBrace,
-
-		ClosingCurlyBrace,
-
-//		DoubleConstant,
-
-//		IntConstant,
-		True,
-		
-		False,
-		Identifier;
-
-		
-
-		
-
-		
-
+public enum TokenType {
+	
+	
+	LOGICALOR("\\|\\|"),
+	LOGICALAND("\\&\\&"),
+	
 	
 
-		/**
-		 * Determines if this token is auxiliary
-		 * 
-		 * @return {@code true} if token is auxiliary, {@code false} otherwise
-		 */
-		public boolean isAuxiliary() {
-			return this == BlockComment || this == LineComment || this == NewLine || this == Tab
-					|| this == WhiteSpace;
-		}
-	}
+	BLOCKCOMMENT("/\\*.*?\\*/"),
+	LINECOMMENT("//(.*?)[\\r$]?\\n"),
+	FLOATDOUBLENUMBER("[+-]?([0-9]+[.][0-9]+)"),
+	NUMBER("[+-]?[0-9]+"),
+	
+	PLUSPLUSOP("\\+\\+"),
+	MINUSMINUSOP("\\-\\-"),
+	PLUSOP("\\+"),
+	MINUSOP("\\-"),
+	DIVOP("\\/"),
+	MULTIPLYOP("\\*"),
+	MODOP("\\%"),
+	CLASS("class"),
+	ASSIGNMENTOP("\\="),
+	EQUALEQUALOP("\\=\\="),
+	EXCLAIMEQUAL("\\!\\="),
+	GREATEREQUALOP("\\>\\="),
+	LESSEQUALOP("\\<\\="),
+	GREATEROP("\\>"),
+	LESSEROP("\\<"),
+	OPENBRACE("\\("),
+	CLOSEBRACE("\\)"),
+	OPENCURLYBRACE("\\{"),
+	CLOSECURLYBRACE("\\}"),
+	COLON("\\,"),
+	SEMICOLON("\\;"),
+	
+	
+	
 
+	SKIP("[ \t\f\r\n]+"),
+	VARTYPE("char|int|double|float|boolean|String|long"),
+	KEYWORD("for|if|else if|else|then|while|elsif|switch|case|break|static|void|public|default|continue|return"),
+	BOOLEANLITERAL("true|false"),
+	IDENTIFIER("[a-zA-Z-0-9_\\+\\-]{1}[0-9a-zA-Z_]{0,31}"),
+	CHARVALUE("\'.\'"),
+	STRINGVALUE("\".*\"");
+	//add charvalue to conditions
+	
+	private final String pattern;
+//
+    
 
+    private TokenType(String pattern) {
+      this.pattern = pattern;
+    }
+    
+    public String getPattern()
+    {
+    	return pattern;
+    }
+    public boolean isAuxiliary() { return this == SKIP; }
+
+			 
+			 
+}
