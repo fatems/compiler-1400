@@ -1,53 +1,19 @@
 public class Token {
 
-	/** The beginning index of this token in the input */
-	private int beginIndex;
 
-	/** The ending index of token in the input */
-	private int endIndex;
-
-	/** Type(category) of token */
 	private TokenType tokenType;
 
-	/** String of characters for this token */
-	private String tokenString;
-
-	/**
-	 * Constructs new {@code Token} object with specified parameters.
-	 * 
-	 * @param beginIndex
-	 *            the beginning index of this token in the input, inclusive
-	 * @param endIndex
-	 *            the ending index of token in the input, exclusive
-	 * @param tokenString
-	 *            string of characters
-	 * @param tokenType
-	 *            type of token
-	 */
-	public Token(int beginIndex, int endIndex, String tokenString, TokenType tokenType) {
-		this.beginIndex = beginIndex;
-		this.endIndex = endIndex;
+	
+	private String lexeme;
+	
+	public Token(TokenType tokenType,String lexeme) {
+		
 		this.tokenType = tokenType;
-		this.tokenString = tokenString;
+		this.lexeme = lexeme;
 	}
 
-	/**
-	 * Returns the beginning index
-	 * 
-	 * @return the beginning index of this token in the input, inclusive
-	 */
-	public int getBegin() {
-		return beginIndex;
-	}
 
-	/**
-	 * Returns the ending index
-	 * 
-	 * @return the ending index of token in the input, exclusive
-	 */
-	public int getEnd() {
-		return endIndex;
-	}
+	
 
 	
 	/**
@@ -55,8 +21,8 @@ public class Token {
 	 * 
 	 * @return a string of characters associated with this token
 	 */
-	public String getTokenString() {
-		return tokenString;
+	public String getLexeme() {
+		return lexeme;
 	}
 
 
@@ -71,9 +37,6 @@ public class Token {
 
 	@Override
 	public String toString() {
-		if (!this.getTokenType().isAuxiliary())
-			return tokenType + "  '" + tokenString + "' [" + beginIndex + ";" + endIndex + "] ";
-		else
-			return tokenType + "   [" + beginIndex + ";" + endIndex + "] ";
-	}
+	      return String.format("%-10s => [%s]", tokenType.name(), lexeme);
+	    }
 }
