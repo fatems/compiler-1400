@@ -8,7 +8,7 @@ public class Controller {
 	public static void main(String[] args) throws AnalyzerException {
 		// TODO Auto-generated method stub
 		String myString ="";
-//		Controller c = new Controller();
+
 		try {
 			Scanner sc = new Scanner(new BufferedReader(new FileReader("Source.txt")));
 			while(sc.hasNextLine()) {
@@ -16,16 +16,17 @@ public class Controller {
 	 			myString += "\n";
 	 			
 	 		}
-			//System.out.println(myString);
+		
 			
 			
 			//instansiate a lexer from it's class
 			Lexer L = new Lexer();
+			L.lex(myString);
+			System.out.println(L.getFilteredTokens());
 			
-			//Tokenize
-			L.tokenize(myString);
-			
-			System.out.println(L.getTokens());
+			System.out.println("*************************************************SYMBOL TABLE*************************************************");
+			L.SymbolTable();
+			System.out.println("type, name, value");
 			System.out.println(L.SymbolResult);
 			
 			
@@ -38,9 +39,8 @@ public class Controller {
 	         
 		
 	}
-	public void readModule(String string) throws FileNotFoundException {
 		
  		
-	}
+	
 
 }
