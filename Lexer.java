@@ -7,23 +7,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-//import token.Token;
-//import token.TokenType;
 
-/**
- * The {@code Lexer} class represents lexical analyzer for subset of Java
- * language.
- * 
- * @author Ira Korshunova
- * 
- */
+
+
 public class Lexer {
 
-	/** Mapping from type of token to its regular expression */
-	 //Map<TokenType, String> regEx;
 
-	/** List of tokens as they appear in the input source */
-	// List<Token> result;
 
 	 String src;
 	 
@@ -92,13 +81,11 @@ public class Lexer {
 			
 			
 			navigate++;
-			//System.out.println(token.getLexeme());
-		//	System.out.println("stack peek"+tokenstack.peek().toString());
+		
 
 			if(token.getTokenType().toString() == "VARTYPE") {
 				if(oldestStackElementTokenType == "VARTYPE" && symTableColIndex<3 ) {
 					int j = 3 - symTableColIndex;
-					//System.out.println(j);
 					for(int i=0; i<j ;i++) {
 						stack.push("undefined");
 					}
@@ -154,7 +141,6 @@ public class Lexer {
 			
 			if(navigate > getFilteredTokens().size()-1 && oldestStackElementTokenType != "") {
 				int j = 3 - symTableColIndex;
-				//System.out.println(j);
 				for(int i=0; i<j ;i++) {
 					stack.push("undefined");
 				}
