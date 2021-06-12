@@ -5,7 +5,7 @@ import java.util.Scanner;
 import java.io.BufferedReader;
 public class Controller {
 
-	public static void main(String[] args) throws AnalyzerException {
+	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
 		String myString ="";
 
