@@ -1,6 +1,8 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Stack;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -24,7 +26,7 @@ public class Lexer {
 	 Stack<String> undefinedTokenTypes = new Stack<String>();
 	 int symTableColIndex=0;
 	 int ii=0;
-	 Map<String, String[]> SymbolTable;
+	 HashMap<String, String[]> SymbolTable;
 	 
 	 
 	 //used for printing symbol table
@@ -33,7 +35,7 @@ public class Lexer {
 	 ArrayList<Token> result;
 	 
 	 public Lexer() {
-		 SymbolTable=new TreeMap<String, String[]>();
+		 SymbolTable=new HashMap<String, String[]>();
 	 }
 	 
 
@@ -88,11 +90,12 @@ public class Lexer {
 		
 		String id1="";
 		String id2="";
-		
+		String containsID="";
 
 		//System.out.println("stack peek"+tokenstack.peek().toString());
 		
 		for(Token token : getFilteredTokens()) {
+			
 			
 			
 			navigate++;
@@ -106,6 +109,7 @@ public class Lexer {
 					}
 					
 					printStack(stack, symTableColIndex);
+					
 					emptyStack(stack);
 
 				}
@@ -118,48 +122,34 @@ public class Lexer {
 				symTableColIndex++;
 			}
 			else if(token.getTokenType().toString() == "IDENTIFIER" &&
-					tokenstack.peek().toString()=="VARTYPE")
+					tokenstack.peek().toString()=="VARTYPE" &&
+					!SymbolTable.containsKey(token.getLexeme()))
 					
 			{
 				id1 = token.getLexeme();
 				stack.push(token.getLexeme());
 				tokenstack.push(token.getTokenType().toString());
 				symTableColIndex++;
+				containsID=id1;
 			}
+			
 			/////////////////////
 			else if (
 					token.getTokenType().toString()=="IDENTIFIER"&&
-					!id1.equals(token.getLexeme()) ) {
+					!SymbolTable.containsKey(token.getLexeme()) ) {
 				if(undefinedTypes.peek()==" ") {
 					undefinedTypes.push("undefined");
 					undefinedTypes.push(token.getLexeme());
 					undefinedTokenTypes.push(token.getTokenType().toString());
 					id2= token.getLexeme();
+					containsID=id2;
 					ii=2;
 				}
 				
 				
 	
 			}
-			else if (
-				//	tokenstack.peek().toString()=="IDENTIFIER" &&
-					token.getTokenType().toString()=="IDENTIFIER" &&
-					id1.equals(token.getLexeme())) {
-				
-					if(tokenstack.peek().toString()==" " ) {
-						//already pushed in stack
-						stack.push(oldestStackElement);
-						stack.push(token.getLexeme());
-						tokenstack.push(oldestStackElementTokenType);
-						tokenstack.push(token.getTokenType().toString());
-						
-					}
-					symTableColIndex=2;
-					id2=token.getLexeme();
-					
-					
-	
-			}
+			
 			
 			
 			else if (
@@ -179,7 +169,7 @@ public class Lexer {
 					token.getTokenType().toString()=="BOOLEANLITERAL"||
 					token.getTokenType().toString()=="STRINGVALUE"||
 					token.getTokenType().toString()=="CHARVALUE") &&
-					!id1.equals(id2))
+					!SymbolTable.containsKey(id2) )
 			{
 				ii++;
 				undefinedTokenTypes.push(token.getTokenType().toString());
@@ -187,6 +177,14 @@ public class Lexer {
 				printStack(undefinedTypes, ii);
 				emptyStack(undefinedTokenTypes);
 			}
+			else if (
+					token.getTokenType().toString()=="IDENTIFIER"&&
+					
+					SymbolTable.containsKey(token.getLexeme()) ) {
+					containsID=token.getLexeme();
+					
+			}
+			
 			
 			
 			////////////////////////////////////
@@ -203,7 +201,8 @@ public class Lexer {
 			else if(tokenstack.peek().toString()=="ASSIGNMENTOP") 
 			 {
 				
-				if(
+				
+				 if(!SymbolTable.containsKey(containsID) &&
 						(token.getTokenType().toString()=="NUMBER" && (oldestStackElement.equals("int") || oldestStackElement.equals("long"))) ||
 						(token.getTokenType().toString()=="FLOATDOUBLENUMBER" && ((oldestStackElement.equals("double")) || (oldestStackElement.equals("float"))))||
 						(token.getTokenType().toString()=="BOOLEANLITERAL" && (oldestStackElement.equals("boolean") ))||
@@ -213,13 +212,39 @@ public class Lexer {
 				{
 					
 					
+					
+					
+					
 					stack.push(token.getLexeme());
 					tokenstack.push(token.getTokenType().toString());
 					symTableColIndex++;
 					printStack(stack, symTableColIndex);
 					emptyStack(tokenstack);
 				}
+				 else if(SymbolTable.containsKey(containsID) &&
+						 ((token.getTokenType().toString()=="NUMBER" && (oldestStackElement.equals("int") || oldestStackElement.equals("long"))) ||
+							(token.getTokenType().toString()=="FLOATDOUBLENUMBER" && ((oldestStackElement.equals("double")) || (oldestStackElement.equals("float"))))||
+							(token.getTokenType().toString()=="BOOLEANLITERAL" && (oldestStackElement.equals("boolean") ))||
+							
+							(token.getTokenType().toString()=="CHARVALUE" && oldestStackElement.equals("char"))||
+							(token.getTokenType().toString()=="STRINGVALUE" && oldestStackElement.equals("String"))))
+				 {
+					 String s[]=new String[2];
+					 for (Entry<String, String[]> entry : SymbolTable.entrySet()) {
+					        if (entry.getKey().equals(id1)) {
+					        	s[0]=entry.getValue()[0];
+					        	s[1]= token.getLexeme();
+					            SymbolTable.put(id1, s);
+					        }
+						}
+				 }
+						 
+					 
+				 
+				 
 			 }
+		
+			
 		
 			
 			if(navigate > getFilteredTokens().size()-1 ) {
@@ -245,7 +270,7 @@ public class Lexer {
 				
 			}
 			
-
+			
 		}
 	}
 	
@@ -253,49 +278,59 @@ public class Lexer {
 	
 	public void printStack(Stack<String> st, int symIndex) {
 		symIndex=0;
-		Stack<String> temp = new Stack<String>();
+		//Stack<String> temp = new Stack<String>();
+		String s[]= new String[3];
+		int i=0;
 		String arg1;
+		String arg2[] = new String[2];
 		
 		SymbolResult += "(";
-		while (st.empty() == false)
+		while (st.empty() == false && i<3)
 		  {
-		    temp.push(st.peek());
-		    st.pop();
-		    
+			
+				s[i]= st.peek();
+			    i++;
+			    st.pop();
 		  }  
-		while(temp.empty() == false) 
-		{
-			String s = temp.peek();
+		//identifiers name
+		arg1=s[1];
+		//type
+		arg2[0]=s[2];
+		//value
+		arg2[1]=s[0];
+		
+		SymbolTable.put(arg1, arg2);
 			
-			if(s != " " && s != "=") {
-				SymbolResult += s;
-				SymbolResult += ",";
-			}
-			
-			
-			temp.pop();
-		}
+		
+		
 		//delete the extra "," at the end
-		SymbolResult=SymbolResult.substring(0, SymbolResult.length() - 1); 
+		//SymbolResult=SymbolResult.substring(0, SymbolResult.length() - 1); 
 		
 		
 		
 		
-		SymbolResult += ")\n";
+		//SymbolResult += ")\n";
 		st.push(" ");
 		
 		
 		
 		
 	}
-	public void emptyStack(Stack<String> s ) {
+	public void emptyStack(Stack<String> s  ) {
 		while(s.empty()== false) {
 			s.pop();
 		}
 		s.push(" ");
 		//String lastElement1, String lastElement2
-//		lastElement1="";
-//		lastElement2="";
+		
+	}
+	public void printHashMap() {
+		for (Map.Entry<String, String[]> entry : SymbolTable.entrySet()) {
+			if(!entry.getKey().equals(" ")) {
+				System.out.println(entry.getKey()+" : "+entry.getValue()[0]+ " "+entry.getValue()[1]);
+			}
+		    
+		}
 	}
 
 	
