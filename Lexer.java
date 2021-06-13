@@ -1,6 +1,8 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,17 +16,25 @@ public class Lexer {
 
 	 String src;
 	 
-	 String oldestStackElement;
-	 String oldestStackElementTokenType;
+	 String oldestStackElement="";
+	 String oldestStackElementTokenType="";
 	 Stack<String> stack = new Stack<String>();
 	 Stack<String> tokenstack= new Stack<String>();
+	 Stack<String> undefinedTypes = new Stack<String>();
+	 Stack<String> undefinedTokenTypes = new Stack<String>();
 	 int symTableColIndex=0;
+	 int ii=0;
+	 Map<String, String[]> SymbolTable;
 	 
 	 
 	 //used for printing symbol table
 	 String SymbolResult="";
 	 
 	 ArrayList<Token> result;
+	 
+	 public Lexer() {
+		 SymbolTable=new TreeMap<String, String[]>();
+	 }
 	 
 
 	 
@@ -72,7 +82,14 @@ public class Lexer {
 		
 		stack.push(" ");
 		tokenstack.push(" ");
+		undefinedTypes.push(" ");
+		undefinedTokenTypes.push(" ");
 		int navigate=0;
+		
+		String id1="";
+		String id2="";
+		
+
 		//System.out.println("stack peek"+tokenstack.peek().toString());
 		
 		for(Token token : getFilteredTokens()) {
@@ -88,11 +105,11 @@ public class Lexer {
 						stack.push("undefined");
 					}
 					
-					printStack();
-					
-					
-					
+					printStack(stack, symTableColIndex);
+					emptyStack(stack);
+
 				}
+
 				
 				oldestStackElement = token.getLexeme();
 				oldestStackElementTokenType= token.getTokenType().toString();
@@ -104,10 +121,76 @@ public class Lexer {
 					tokenstack.peek().toString()=="VARTYPE")
 					
 			{
+				id1 = token.getLexeme();
 				stack.push(token.getLexeme());
 				tokenstack.push(token.getTokenType().toString());
 				symTableColIndex++;
 			}
+			/////////////////////
+			else if (
+					token.getTokenType().toString()=="IDENTIFIER"&&
+					!id1.equals(token.getLexeme()) ) {
+				if(undefinedTypes.peek()==" ") {
+					undefinedTypes.push("undefined");
+					undefinedTypes.push(token.getLexeme());
+					undefinedTokenTypes.push(token.getTokenType().toString());
+					id2= token.getLexeme();
+					ii=2;
+				}
+				
+				
+	
+			}
+			else if (
+				//	tokenstack.peek().toString()=="IDENTIFIER" &&
+					token.getTokenType().toString()=="IDENTIFIER" &&
+					id1.equals(token.getLexeme())) {
+				
+					if(tokenstack.peek().toString()==" " ) {
+						//already pushed in stack
+						stack.push(oldestStackElement);
+						stack.push(token.getLexeme());
+						tokenstack.push(oldestStackElementTokenType);
+						tokenstack.push(token.getTokenType().toString());
+						
+					}
+					symTableColIndex=2;
+					id2=token.getLexeme();
+					
+					
+	
+			}
+			
+			
+			else if (
+					undefinedTokenTypes.peek().toString()=="IDENTIFIER" &&
+					token.getTokenType().toString()=="ASSIGNMENTOP" 
+					) {
+				
+				undefinedTokenTypes.push(token.getTokenType().toString());
+				
+				
+	
+			}
+			else if(
+					undefinedTokenTypes.peek().toString().equals("ASSIGNMENTOP") &&
+					(token.getTokenType().toString()=="NUMBER"||
+					token.getTokenType().toString()=="FLOATDOUBLENUMBER"||
+					token.getTokenType().toString()=="BOOLEANLITERAL"||
+					token.getTokenType().toString()=="STRINGVALUE"||
+					token.getTokenType().toString()=="CHARVALUE") &&
+					!id1.equals(id2))
+			{
+				ii++;
+				undefinedTokenTypes.push(token.getTokenType().toString());
+				undefinedTypes.push(token.getLexeme());
+				printStack(undefinedTypes, ii);
+				emptyStack(undefinedTokenTypes);
+			}
+			
+			
+			////////////////////////////////////
+			
 			else if(token.getTokenType().toString() == "ASSIGNMENTOP" &&
 					tokenstack.peek().toString()=="IDENTIFIER")
 			{
@@ -129,20 +212,37 @@ public class Lexer {
 						(token.getTokenType().toString()=="STRINGVALUE" && oldestStackElement.equals("String"))) 
 				{
 					
+					
 					stack.push(token.getLexeme());
 					tokenstack.push(token.getTokenType().toString());
 					symTableColIndex++;
-					printStack();
-					
+					printStack(stack, symTableColIndex);
+					emptyStack(tokenstack);
 				}
 			 }
+		
 			
-			if(navigate > getFilteredTokens().size()-1 && oldestStackElementTokenType != "") {
+			if(navigate > getFilteredTokens().size()-1 ) {
 				int j = 3 - symTableColIndex;
-				for(int i=0; i<j ;i++) {
-					stack.push("undefined");
+				int k = 3- ii;
+				System.out.println("this is k: "+k);
+				if(j<3) {
+					for(int i=0; i<j ;i++) {
+						stack.push("undefined");
+					}
+					printStack(stack, symTableColIndex);
+					
+					emptyStack(tokenstack);
 				}
-				printStack();
+				if(k<3) {
+					for(int i=0; i<k ;i++) {
+						undefinedTypes.push("undefined");
+					}
+					printStack(undefinedTypes, ii);
+					
+					emptyStack(undefinedTokenTypes);
+				}
+				
 			}
 			
 
@@ -151,21 +251,23 @@ public class Lexer {
 	
 
 	
-	public void printStack() {
-		symTableColIndex=0;
+	public void printStack(Stack<String> st, int symIndex) {
+		symIndex=0;
 		Stack<String> temp = new Stack<String>();
+		String arg1;
+		
 		SymbolResult += "(";
-		while (stack.empty() == false)
+		while (st.empty() == false)
 		  {
-		    temp.push(stack.peek());
-		    stack.pop();
+		    temp.push(st.peek());
+		    st.pop();
 		    
 		  }  
 		while(temp.empty() == false) 
 		{
 			String s = temp.peek();
 			
-			if(s != " ") {
+			if(s != " " && s != "=") {
 				SymbolResult += s;
 				SymbolResult += ",";
 			}
@@ -176,18 +278,24 @@ public class Lexer {
 		//delete the extra "," at the end
 		SymbolResult=SymbolResult.substring(0, SymbolResult.length() - 1); 
 		
-		while(tokenstack.empty()== false) {
-			tokenstack.pop();
-		}
-		stack.push(" ");
-		tokenstack.push(" ");
-		oldestStackElementTokenType="";
-		oldestStackElement="";
+		
+		
+		
 		SymbolResult += ")\n";
+		st.push(" ");
 		
 		
 		
 		
+	}
+	public void emptyStack(Stack<String> s ) {
+		while(s.empty()== false) {
+			s.pop();
+		}
+		s.push(" ");
+		//String lastElement1, String lastElement2
+//		lastElement1="";
+//		lastElement2="";
 	}
 
 	
