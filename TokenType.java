@@ -1,4 +1,3 @@
-
 public enum TokenType {
 	
 	
@@ -7,7 +6,7 @@ public enum TokenType {
 	
 	
 
-	BLOCKCOMMENT("/\\*.*?\\*/"),
+	BLOCKCOMMENT("/\\*\\s*.*\\s*\\*/"),
 	LINECOMMENT("//(.*?)[\\r$]?\\n"),
 	FLOATDOUBLENUMBER("[+-]?([0-9]+[.][0-9]+)"),
 	NUMBER("[+-]?[0-9]+"),
@@ -20,8 +19,9 @@ public enum TokenType {
 	MULTIPLYOP("\\*"),
 	MODOP("\\%"),
 	CLASS("class"),
-	ASSIGNMENTOP("\\="),
+	
 	EQUALEQUALOP("\\=\\="),
+	ASSIGNMENTOP("\\="),
 	EXCLAIMEQUAL("\\!\\="),
 	GREATEREQUALOP("\\>\\="),
 	LESSEQUALOP("\\<\\="),
@@ -39,7 +39,7 @@ public enum TokenType {
 
 	SKIP("[ \t\f\r\n]+"),
 	VARTYPE("char|int|double|float|boolean|String|long"),
-	KEYWORD("for|if|else if|else|then|while|elsif|switch|case|break|static|void|public|default|continue|return"),
+	KEYWORD("main|for|if|else if|else|then|while|elsif|switch|case|break|static|void|public|default|continue|return"),
 	BOOLEANLITERAL("true|false"),
 	IDENTIFIER("[a-zA-Z-0-9_\\+\\-]{1}[0-9a-zA-Z_]{0,31}"),
 	CHARVALUE("\'.\'"),
@@ -60,6 +60,5 @@ public enum TokenType {
     }
     public boolean isAuxiliary() { return this == SKIP; }
 
-			 
 			 
 }
