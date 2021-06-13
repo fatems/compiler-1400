@@ -27,7 +27,7 @@ public class Controller {
 			System.out.println("*************************************************SYMBOL TABLE*************************************************");
 			L.SymbolTable();
 			System.out.println("type, name, value");
-			System.out.println(L.SymbolResult);
+			L.printHashMap();
 			
 			
 		} catch (FileNotFoundException e) {
