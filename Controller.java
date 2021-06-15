@@ -6,7 +6,7 @@ import java.io.BufferedReader;
 public class Controller {
 
 	public static void main(String[] args) throws Exception {
-		// TODO Auto-generated method stub
+		
 		String myString ="";
 
 		try {
@@ -26,7 +26,7 @@ public class Controller {
 			
 			System.out.println("*************************************************SYMBOL TABLE*************************************************");
 			L.SymbolTable();
-			System.out.println("type, name, value");
+			System.out.println("name, type, value");
 			L.printHashMap();
 			
 			
