@@ -2,9 +2,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Stack;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,6 +25,8 @@ public class Lexer {
 	 int symTableColIndex=0;
 	 int ii=0;
 	 HashMap<String, String[]> SymbolTable;
+	 boolean predefined=false;
+	 boolean predefined2=false;
 	 
 	 
 	 //used for printing symbol table
@@ -71,6 +71,7 @@ public class Lexer {
 		    Matcher matcher = tokenPatterns.matcher(input);
 		    while (matcher.find()) {
 		      for (TokenType tokentype : TokenType.values())
+		    	  
 		        if (matcher.group(tokentype.name()) != null) {
 		          result.add(new Token(tokentype, matcher.group(tokentype.name())));
 		          continue;
@@ -91,6 +92,9 @@ public class Lexer {
 		String id1="";
 		String id2="";
 		String containsID="";
+		int nav1=0;
+		int nav2=0;
+		
 
 		//System.out.println("stack peek"+tokenstack.peek().toString());
 		
@@ -100,8 +104,45 @@ public class Lexer {
 			
 			navigate++;
 		
-
-			if(token.getTokenType().toString() == "VARTYPE") {
+			if (
+					token.getTokenType().toString()=="IDENTIFIER"&&
+					
+					SymbolTable.containsKey(token.getLexeme()) ) {
+				
+					predefined=true;
+					containsID=token.getLexeme();
+					nav1=navigate;
+					
+			}
+			else if(token.getTokenType().toString()=="ASSIGNMENTOP"&&
+					
+					predefined && (navigate-nav1)==1)
+					{predefined2=true;
+					
+					nav2=navigate;
+					}
+			
+			else if(predefined2&& (token.getTokenType().toString().equals("NUMBER")||
+					token.getTokenType().toString().equals("FLOATDOUBLENUMBER")||
+					token.getTokenType().toString().equals("BOOLEANLITERAL")||
+					token.getTokenType().toString().equals("CHARVALUE")||
+					token.getTokenType().toString().equals("STRINGVALUE"))
+					&& ((navigate-nav2)==1))
+			 {
+				String s[]=new String[2];
+				if(SymbolTable.containsKey(containsID)) {
+					
+					s[0]=SymbolTable.get(containsID)[0];
+				        	
+				        	s[1]= token.getLexeme();
+				            SymbolTable.put(containsID, s);
+				
+				}
+	        	
+				 predefined=false;
+				 predefined2=false;
+			 }
+			else if(token.getTokenType().toString() == "VARTYPE") {
 				if(oldestStackElementTokenType == "VARTYPE" && symTableColIndex<3 ) {
 					int j = 3 - symTableColIndex;
 					for(int i=0; i<j ;i++) {
@@ -130,7 +171,6 @@ public class Lexer {
 				stack.push(token.getLexeme());
 				tokenstack.push(token.getTokenType().toString());
 				symTableColIndex++;
-				containsID=id1;
 			}
 			
 			/////////////////////
@@ -142,7 +182,6 @@ public class Lexer {
 					undefinedTypes.push(token.getLexeme());
 					undefinedTokenTypes.push(token.getTokenType().toString());
 					id2= token.getLexeme();
-					containsID=id2;
 					ii=2;
 				}
 				
@@ -168,8 +207,8 @@ public class Lexer {
 					token.getTokenType().toString()=="FLOATDOUBLENUMBER"||
 					token.getTokenType().toString()=="BOOLEANLITERAL"||
 					token.getTokenType().toString()=="STRINGVALUE"||
-					token.getTokenType().toString()=="CHARVALUE") &&
-					!SymbolTable.containsKey(id2) )
+					token.getTokenType().toString()=="CHARVALUE") 
+					 )
 			{
 				ii++;
 				undefinedTokenTypes.push(token.getTokenType().toString());
@@ -177,13 +216,7 @@ public class Lexer {
 				printStack(undefinedTypes, ii);
 				emptyStack(undefinedTokenTypes);
 			}
-			else if (
-					token.getTokenType().toString()=="IDENTIFIER"&&
-					
-					SymbolTable.containsKey(token.getLexeme()) ) {
-					containsID=token.getLexeme();
-					
-			}
+			
 			
 			
 			
@@ -202,7 +235,7 @@ public class Lexer {
 			 {
 				
 				
-				 if(!SymbolTable.containsKey(containsID) &&
+				 if(
 						(token.getTokenType().toString()=="NUMBER" && (oldestStackElement.equals("int") || oldestStackElement.equals("long"))) ||
 						(token.getTokenType().toString()=="FLOATDOUBLENUMBER" && ((oldestStackElement.equals("double")) || (oldestStackElement.equals("float"))))||
 						(token.getTokenType().toString()=="BOOLEANLITERAL" && (oldestStackElement.equals("boolean") ))||
@@ -221,22 +254,6 @@ public class Lexer {
 					printStack(stack, symTableColIndex);
 					emptyStack(tokenstack);
 				}
-				 else if(SymbolTable.containsKey(containsID) &&
-						 ((token.getTokenType().toString()=="NUMBER" && (oldestStackElement.equals("int") || oldestStackElement.equals("long"))) ||
-							(token.getTokenType().toString()=="FLOATDOUBLENUMBER" && ((oldestStackElement.equals("double")) || (oldestStackElement.equals("float"))))||
-							(token.getTokenType().toString()=="BOOLEANLITERAL" && (oldestStackElement.equals("boolean") ))||
-							
-							(token.getTokenType().toString()=="CHARVALUE" && oldestStackElement.equals("char"))||
-							(token.getTokenType().toString()=="STRINGVALUE" && oldestStackElement.equals("String"))))
-				 {
-					 String s[]=new String[2];
-					 for (Entry<String, String[]> entry : SymbolTable.entrySet()) {
-					        if (entry.getKey().equals(id1)) {
-					        	s[0]=entry.getValue()[0];
-					        	s[1]= token.getLexeme();
-					            SymbolTable.put(id1, s);
-					        }
-						}
 				 }
 						 
 					 
@@ -250,7 +267,6 @@ public class Lexer {
 			if(navigate > getFilteredTokens().size()-1 ) {
 				int j = 3 - symTableColIndex;
 				int k = 3- ii;
-				System.out.println("this is k: "+k);
 				if(j<3) {
 					for(int i=0; i<j ;i++) {
 						stack.push("undefined");
@@ -272,13 +288,12 @@ public class Lexer {
 			
 			
 		}
-	}
+	
 	
 
 	
 	public void printStack(Stack<String> st, int symIndex) {
 		symIndex=0;
-		//Stack<String> temp = new Stack<String>();
 		String s[]= new String[3];
 		int i=0;
 		String arg1;
@@ -301,15 +316,6 @@ public class Lexer {
 		
 		SymbolTable.put(arg1, arg2);
 			
-		
-		
-		//delete the extra "," at the end
-		//SymbolResult=SymbolResult.substring(0, SymbolResult.length() - 1); 
-		
-		
-		
-		
-		//SymbolResult += ")\n";
 		st.push(" ");
 		
 		
@@ -321,7 +327,6 @@ public class Lexer {
 			s.pop();
 		}
 		s.push(" ");
-		//String lastElement1, String lastElement2
 		
 	}
 	public void printHashMap() {
