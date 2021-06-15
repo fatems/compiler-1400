@@ -44,7 +44,6 @@ public enum TokenType {
 	IDENTIFIER("[a-zA-Z-0-9_\\+\\-]{1}[0-9a-zA-Z_]{0,31}"),
 	CHARVALUE("\'.\'"),
 	STRINGVALUE("\".*\"");
-	//add charvalue to conditions
 	
 	private final String pattern;
 //
